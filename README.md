@@ -14,7 +14,7 @@ This will spawn an containerized `opencode` agent with just the specified files 
 
 ## Just a container and an `opencode` stand-in script
 
-This thing comes in two parts: The container with OpenCode inside and a script for running the containerized `opencode` executable with some of the hosts files or directories mounted inside the container for the agent to work with.
+This thing comes in two parts: The container with OpenCode and some tooling inside and a script for running the containerized `opencode` executable with some of the hosts files or directories mounted inside the container for the agent to work with.
 
 ### The OpenCode container
 
@@ -60,7 +60,7 @@ will mount ` ~/projects/this` (i.e. `$PWD`) in `WORKDIR`, `~/projects/that` read
 
 This thing is developed with [rootless](https://rootlesscontaine.rs/) [Podman](https://github.com/containers/podman/) and [`build.sh`](https://github.com/7h145/ocinabox/blob/main/build.sh) as well as [`ocinabox.sh`](https://github.com/7h145/ocinabox/blob/main/ocinabox.sh) use Podman as default high-level container runtime.  But nothing really special happens here, any "docker lookalike" container runtime will do (e.g. [Docker](https://github.com/docker)).
 
-Both scripts are already set up to switch the container runtime from `podman` to `docker`; it's a matter of changing two comments in each file.
+Both scripts are already set up to switch the container runtime from `podman` to `docker`; it's a matter of changing two comments in each file (search for 'docker').
 
 You should really use [rootless](https://rootlesscontaine.rs/) containers, not only but especially if you care for adversarial isolation (which is the point in this case), but it will of course run rootfull just fine.
 
