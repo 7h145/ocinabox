@@ -7,7 +7,7 @@
 #
 # Remark: This wrapper was build an tested using podman as container
 #  runtime.  It should work just fine with other "docker lookalike"
-#  runtimes, like e.g. docker, see $C[crun] configuration below.
+#  runtimes, like e.g. docker.  See $C[crt] configuration below.
 #  The comments in this script always refer to podman however.
 #
 # Usage: ${IAM} [SOURCE-VOLUME|HOST-DIR[:OPTIONS]...] [OPENCODE-ARGV...]
@@ -44,10 +44,10 @@ declare -A C=(
   # Container runtime: This wrapper was build an tested using podman
   # (https://github.com/containers/podman) as (high-level) container
   # runtime, but should run just fine with other "docker lookalike"
-  # runtimes, e.g. docker (https://github.com/docker).
+  # OCI runtimes, like e.g. docker (https://github.com/docker).
   # Default is 'podman'.
-  [crun]='podman'
-  #[crun]='docker'
+  [crt]='podman'
+  #[crt]='docker'
 
   # The name prefix for containers and volumes: containers running with
   # the same name prefix share their runtime volumes.  The default name
@@ -91,7 +91,7 @@ parse_volumespec() {
   )
 
   # check if $volorpath is a podman volume or a path
-  if "${C[crun]}" volume exists "${VSPEC[volorpath]}"; then
+  if "${C[crt]}" volume exists "${VSPEC[volorpath]}"; then
     # this is a podman volume
     VSPEC[source-volorpath]="${VSPEC[volorpath]}"
     VSPEC[conatainer-dir]+="/${VSPEC[volorpath]}"
@@ -200,5 +200,5 @@ PMARGV=(
   ${PMARGS_PRJVOLUMES:+"${PMARGS_PRJVOLUMES[@]}"}
 )
 
-"${C[crun]}" run "${PMARGV[@]}" opencode "${@}"
+"${C[crt]}" run "${PMARGV[@]}" opencode "${@}"
 
