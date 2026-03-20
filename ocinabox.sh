@@ -3,7 +3,7 @@
 #
 # copyright 2025 <github.attic@typedef.net>, CC BY 4.0
 #
-# This is just a wrapper script for the containerized sst/opencode cli.
+# This is just a wrapper script for the containerized opencode cli.
 #
 # Remark: This wrapper was build an tested using podman as container
 #  runtime.  It should work just fine with other "docker lookalike"
@@ -189,12 +189,14 @@ PMARGS_PUBLISH=(
 
   # random port on the host; this allows multiple instances to run
   #'--publish' ':47817'
+
+  # no network namespacing (and hence no need for `--publish`)
+  #'--network=host'
 )
 
 PMARGV=(
   '--name' "${C[name]}-${SRANDOM}"
   '--interactive' '--tty' '--rm'
-  #'--network=host'
   ${PMARGS_PUBLISH:+"${PMARGS_PUBLISH[@]}"}
   ${PMARGS_VOLUMES:+"${PMARGS_VOLUMES[@]}"}
   ${PMARGS_PRJVOLUMES:+"${PMARGS_PRJVOLUMES[@]}"}
