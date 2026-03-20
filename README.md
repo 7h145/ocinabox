@@ -6,7 +6,7 @@ In modern times, coding or general AI agents do stuff on your computer. While I 
 
 This issue is only partially alleviated by the fact that many agents utilize some internal mechanism to limit access only to certain parts of the system running the agent (because I don't trust these either).  On the other hand, such agents need access to certain parts of your data in order to be helpful, e.g. a bunch of files or the git repository of the project you are working on.
 
-There are several ways to go about this problem, typically involving physically separate systems, virtual machines, or containers.  This project about the [OpenCode](https://opencode.ai/) agent running in a container with selective access to just the data you allow it to see, like e.g. this:
+There are several ways to go about this problem, typically involving physically separate systems, virtual machines, or containers.  This project is about the [OpenCode](https://opencode.ai/) agent running in a container with selective access to just the data you allow it to see, like e.g. this:
 
     ocinabox.sh ~/myprojects/thispoject ~/myprojects/thatfile
 
@@ -20,7 +20,7 @@ This thing comes in two parts: The container with OpenCode and some tooling insi
 
 A [Containerfile](https://github.com/7h145/ocinabox/blob/main/Containerfile) and an small [build script](https://github.com/7h145/ocinabox/blob/main/build.sh) which build a [Debian trixie](https://www.debian.org/releases/trixie/) based runtime environment with a somewhat sane set of tools for the agent pre-installed (but YMMV).
 
-You can easily adjust the tooling in the container for your needs (by editing the Containerfile and run `build.sh` again) or even let the agent install new tools at runtime (but be aware that the containers are startet non-persistent by default).
+You can easily adjust the tooling in the container for your needs (by editing the Containerfile and run `build.sh` again) or even let the agent itself install new tools at runtime (but be aware that the containers are startet non-persistent by default).
 
 Running the `build.sh` build script will build (or re-build) the container, always utilizing the [latest available version of OpenCode](https://github.com/anomalyco/opencode/releases) (and this is fairly efficient due to the layer caching of your container runtime).  So, just `build.sh` and restart your agents in order to update to the latest and greatest OpenCode.
 
@@ -58,7 +58,7 @@ will mount ` ~/projects/this` (i.e. `$PWD`) in `WORKDIR`, `~/projects/that` read
 
 ## The Container Runtime
 
-This thing is developed with [rootless](https://rootlesscontaine.rs/) [Podman](https://github.com/containers/podman/) and [`build.sh`](https://github.com/7h145/ocinabox/blob/main/build.sh) as well as [`ocinabox.sh`](https://github.com/7h145/ocinabox/blob/main/ocinabox.sh) use Podman as default high-level container runtime.  But nothing really special happens here, any "docker lookalike" container runtime will do (e.g. [Docker](https://github.com/docker)).
+This thing is developed with [rootless](https://rootlesscontaine.rs/) [Podman](https://github.com/containers/podman/) in mind and [`build.sh`](https://github.com/7h145/ocinabox/blob/main/build.sh) as well as [`ocinabox.sh`](https://github.com/7h145/ocinabox/blob/main/ocinabox.sh) use Podman as default high-level container runtime.  But nothing really special happens here, any "docker lookalike" container runtime will do (e.g. [Docker](https://github.com/docker)).
 
 Both scripts are already set up to switch the container runtime from `podman` to `docker`; it's a matter of changing two comments in each file (search for 'docker').
 
