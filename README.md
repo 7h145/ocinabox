@@ -16,6 +16,8 @@ This will spawn an containerized `opencode` agent with just the specified files 
 
 This thing comes in two parts: The container with OpenCode and some tooling inside and a script for running the containerized `opencode` executable with some of the hosts files or directories mounted inside the container for the agent to work with.
 
+Security note: This is a containerized setup, but not magic.  Anything you mount into the container is visible to code running there, and it uses the host network namespace (`--network=host`) by default.  Only mount what you actually want to share, use `:ro` where possible.
+
 ### The OpenCode container
 
 A [Containerfile](https://github.com/7h145/ocinabox/blob/main/Containerfile) and an small [build script](https://github.com/7h145/ocinabox/blob/main/build.sh) which build a [Debian trixie](https://www.debian.org/releases/trixie/) based runtime environment with a somewhat sane set of tools for the agent pre-installed (but YMMV).
