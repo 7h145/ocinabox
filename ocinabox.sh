@@ -65,6 +65,10 @@ declare -A C=(
   # isolated auth.json in the $C[name]-share volume.
   # Default is 'true', use host auth.json.
   [use_xdg_data_home/opencode/auth.json]='true'
+
+  # Use host vim configuration: if 'true' and some vim configuration can
+  # be found on the host, use it in the container.
+  [use_vim_configuration]='true'
 )
 
 parse_volumespec() {
@@ -176,6 +180,21 @@ PMARGS_VOLUMES+=( '--volume' "${VOLUMESPEC}" )
     #'--volume' "${AUTHJSON}:/root/.local/share/opencode/auth.json:ro"
     '--volume' "${AUTHJSON}:/root/.local/share/opencode/auth.json"
   )
+}
+
+# vim configuration: if some vim configuration can be found, mount it
+# into the container
+[[ "${C[use_vim_configuration]}" = 'true' ]] && {
+  [[ -f "${HOME}/.vimrc" ]] &&
+    PMARGS_VOLUMES+=( '--volume' "${HOME}/.vimrc:/root/.vimrc:ro" )
+
+  if [[ -f "${HOME}/.vim/vimrc" ]]; then
+    PMARGS_VOLUMES+=( '--volume' "${HOME}/.vim:/root/.vim:ro" )
+  else
+    XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+    [[ -f "${XDG_CONFIG_HOME}/vim/vimrc" ]] &&
+      PMARGS_VOLUMES+=( '--volume' "${XDG_CONFIG_HOME}/vim:/root/.vim:ro" )
+  fi
 }
 
 PMARGV=(

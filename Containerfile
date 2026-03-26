@@ -41,6 +41,11 @@ RUN true \
     yq \
     zip unzip
 
+# interactive tooling
+RUN true \
+  && apt-get install -y --no-install-recommends \
+    vim
+
 # languages/compiler/interpreter
 RUN true \
   && apt-get install -y --no-install-recommends \
@@ -59,6 +64,10 @@ FROM base AS payload
 # invalidate the build cache on payload version change
 ARG PAYLOAD="opencode-ai"
 ARG PAYLOADVERSION
+
+# there can be only one $EDITOR
+ARG EDITOR="vim"
+ENV EDITOR=${EDITOR}
 
 ENV WORKDIR='/stage'
 RUN mkdir $WORKDIR
