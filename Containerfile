@@ -18,19 +18,28 @@ RUN true \
 # basic tooling
 RUN true \
   && apt-get install -y --no-install-recommends \
+    build-essential \
+    bind9-dnsutils \
     curl \
     entr \
     fd-find \
     fzf \
     gh \
     git \
+    git-lfs \
     jq \
     less \
     make \
     man-db \
+    netcat-openbsd \
+    openssh-client \
+    pkg-config \
     ripgrep \
+    rsync \
+    sqlite3 \
     tree \
-    yq
+    yq \
+    zip unzip
 
 # languages/compiler/interpreter
 RUN true \
