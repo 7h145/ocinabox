@@ -60,13 +60,6 @@ RUN true \
   && npm install -g "${PAYLOAD}${PAYLOADVERSION:+@${PAYLOADVERSION}}" \
   && npm cache clean --force
 
-# opencode uses a random port by default; a fixed port is needed for
-# '--publish' or 'EXPOSE', which may be necessary for authorization
-# callbacks or client/server mode.  Not done for now: this will hinder
-# normal command line operation without proper 'ENTRYPOINT' wrapper.
-#ENTRYPOINT [ "/usr/local/bin/opencode", "--hostname", "0.0.0.0", "--port", "47817" ]
-#EXPOSE 47817/tcp
-
 ENTRYPOINT [ "/usr/local/bin/opencode" ]
 #CMD ["--agent", "Plan"]
 

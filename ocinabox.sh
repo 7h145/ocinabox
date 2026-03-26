@@ -178,26 +178,10 @@ PMARGS_VOLUMES+=( '--volume' "${VOLUMESPEC}" )
   )
 }
 
-PMARGS_PUBLISH=(
-  # friendly syntax reminder: `--publish [hostPort]:containerPort`
-
-  # opencode uses a random API port by default; a fixed port can be
-  # set using `--port`.  Examples for `--port 47817`:
-
-  # some fixed port on the host; note that only one instance may run
-  #'--publish' '8080:47817'
-
-  # random port on the host; this allows multiple instances to run
-  #'--publish' ':47817'
-
-  # no network namespacing (and hence no need for `--publish`)
-  #'--network=host'
-)
-
 PMARGV=(
   '--name' "${C[name]}-${SRANDOM}"
   '--interactive' '--tty' '--rm'
-  ${PMARGS_PUBLISH:+"${PMARGS_PUBLISH[@]}"}
+  '--network=host'
   ${PMARGS_VOLUMES:+"${PMARGS_VOLUMES[@]}"}
   ${PMARGS_PRJVOLUMES:+"${PMARGS_PRJVOLUMES[@]}"}
 )
