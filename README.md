@@ -12,11 +12,11 @@ There are several ways to go about this problem, typically involving physically 
 
 This will spawn an containerized `opencode` agent with just the specified files or directories from the host visible inside the container.
 
+Security note: This is a containerized setup, but not magic.  Anything you mount into the container is visible to code running there, and it uses the host network namespace (`--network=host`) by default.  Only mount what you actually want to share, use `:ro` where possible.
+
 ## Just a container and an `opencode` stand-in script
 
 This thing comes in two parts: The container with OpenCode and some tooling inside and a script for running the containerized `opencode` executable with some of the hosts files or directories mounted inside the container for the agent to work with.
-
-Security note: This is a containerized setup, but not magic.  Anything you mount into the container is visible to code running there, and it uses the host network namespace (`--network=host`) by default.  Only mount what you actually want to share, use `:ro` where possible.
 
 ### The OpenCode container
 
