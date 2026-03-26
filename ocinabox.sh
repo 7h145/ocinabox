@@ -188,11 +188,11 @@ PMARGS_VOLUMES+=( '--volume' "${VOLUMESPEC}" )
   [[ -f "${HOME}/.vimrc" ]] &&
     PMARGS_VOLUMES+=( '--volume' "${HOME}/.vimrc:/root/.vimrc:ro" )
 
-  if [[ -f "${HOME}/.vim/vimrc" ]]; then
+  if [[ -d "${HOME}/.vim" ]]; then
     PMARGS_VOLUMES+=( '--volume' "${HOME}/.vim:/root/.vim:ro" )
   else
     XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
-    [[ -f "${XDG_CONFIG_HOME}/vim/vimrc" ]] &&
+    [[ -d "${XDG_CONFIG_HOME}/vim" ]] &&
       PMARGS_VOLUMES+=( '--volume' "${XDG_CONFIG_HOME}/vim:/root/.vim:ro" )
   fi
 }
