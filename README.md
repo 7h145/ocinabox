@@ -22,9 +22,11 @@ This thing comes in two parts: The container with OpenCode and some tooling insi
 
 A [Containerfile](https://github.com/7h145/ocinabox/blob/main/Containerfile) and an small [build script](https://github.com/7h145/ocinabox/blob/main/build.sh) which build a [Debian trixie](https://www.debian.org/releases/trixie/) based runtime environment with a somewhat sane set of tools for the agent pre-installed (but YMMV).
 
-You can easily adjust the tooling in the container for your needs (by editing the Containerfile and run `build.sh` again) or even let the agent itself install new tools at runtime (but be aware that the containers are startet non-persistent by default).
+You can easily adjust the tooling in the container image for your needs (by editing the Containerfile and run `build.sh` again) or even let the agent itself install new tools at runtime (but be aware that the containers are startet non-persistent by default).
 
-Running the `build.sh` build script will build (or re-build) the container, always utilizing the [latest available version of OpenCode](https://github.com/anomalyco/opencode/releases) (and this is fairly efficient due to the layer caching of your container runtime).  So, just `build.sh` and restart your agents in order to update to the latest and greatest OpenCode.
+Running the `build.sh` build script will build (or re-build) the container image, always utilizing the [latest available version of OpenCode](https://github.com/anomalyco/opencode/releases) (and this is fairly efficient due to the layer caching of your container runtime).  So, just `build.sh` and restart your agents in order to update to the latest and greatest OpenCode.
+
+Tip: to rebuild the image from scratch utilizing a fresh base image, use `build.sh --no-cache --pull=always`.
 
 ### The `opencode` stand-in script
 
