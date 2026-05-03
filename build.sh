@@ -8,7 +8,7 @@ declare -A C=(
   #[crt]='docker'
 
   # Version of the Containerfile and build.sh script
-  [containerversion]='0.4'
+  [containerversion]='0.5'
 )
 
 command -v npm >&- || npm() {
@@ -23,6 +23,7 @@ currentnpmversion() {
 }
 
 PAYLOADVERSION="$(currentnpmversion opencode-ai)"
+#PAYLOADVERSION='1.4.6'     # some fixed version if need be
 ARGV+=( '--build-arg' "PAYLOADVERSION=${PAYLOADVERSION}" )
 
 IMAGE='opencode'
