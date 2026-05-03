@@ -159,7 +159,11 @@ declare -A VSPEC=(
 
   [ -d "${XDG_CONFIG_HOME}/opencode" ] && {
     VSPEC[source-volorpath]="${XDG_CONFIG_HOME}/opencode"
-    VSPEC[options]=':ro'
+    # This can (and IMHO should) usually be mounted read-only; the agent
+    # should not modify its configuration.  But since opencode needs
+    # read/write on certain version transitions (e.g. 1.4.6 to 1.4.7),
+    # the default is read/write here.
+    #VSPEC[options]=':ro'
   }
 }
 
