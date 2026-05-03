@@ -18,41 +18,51 @@ RUN true \
 # basic tooling
 RUN true \
   && apt-get install -y --no-install-recommends \
-    build-essential \
-    bind9-dnsutils \
     curl \
     entr \
     fd-find \
     fzf \
     gh \
     git \
-    git-lfs \
     jq \
     less \
     make \
     man-db \
-    netcat-openbsd \
-    openssh-client \
-    pkg-config \
+    pkgconf \
     ripgrep \
-    rsync \
     sqlite3 \
     tree \
     yq \
     zip unzip
+
+# additional tooling, YMMV
+RUN true \
+  && apt-get install -y --no-install-recommends \
+    bind9-dnsutils \
+    build-essential \
+    git-lfs \
+    netcat-openbsd \
+    openssh-client \
+    rsync
 
 # interactive tooling
 RUN true \
   && apt-get install -y --no-install-recommends \
     vim
 
-# languages/compiler/interpreter
+# languages/compilers/interpreters
 RUN true \
   && apt-get install -y --no-install-recommends \
     lua5.1 \
+    pipx \
     python3 \
     python3-pip \
     python3-venv
+
+# https://docs.astral.sh/uv/
+ENV PATH=${PATH}:/root/.local/bin
+RUN true \
+  && pipx install uv
 
 RUN true \
   && apt-get -y remove --purge --auto-remove && apt-get -y clean \
