@@ -60,6 +60,10 @@ You can of course freely mix and match, e.g.
 
 will mount `~/projects/this` (i.e. `$PWD`) in `WORKDIR`, `~/projects/that` read-only in `WORKDIR/that`, and the file `~/some/file` in `WORKDIR/file`.
 
+Further command line arguments are passed through to `opencode` after the leading mount specifications, e.g.
+
+    ocinabox.sh .:ro run 'explain this codebase'
+
 ## Notes
 
 OpenCode may update or migrate its own configuration when versions change.  A read-only host configuration is safest, but can break such upgrades; a read/write mount is more compatible, but lets the container modify the host configuration.
