@@ -60,7 +60,7 @@ declare -A C=(
   # overlay mount mode: host files are visible and container writes
   # succeed, but changes are discarded with the container.
   # Note: 'O' is podman-specific; use 'ro' or 'rw' with docker.
-  # Any other value (like e.g. 'false') uses isolated configuration in
+  # Any other value (like e.g. 'volume') uses isolated configuration in
   # the $C[name]-config volume.
   # Default is 'O', use host configuration without modifying it.
   [use_xdg_config_home/opencode]='O'
@@ -68,7 +68,7 @@ declare -A C=(
   # Use host opencode auth.json: if set to 'ro' or 'rw' and
   # $XDG_DATA_HOME/opencode/auth.json exists on the host, mount it into
   # the container with the selected `--volume` option.
-  # Any other value (like e.g. 'false') uses an isolated auth.json in
+  # Any other value (like e.g. 'volume') uses an isolated auth.json in
   # the $C[name]-share volume.
   # Default is 'rw', use host auth.json read/write.
   [use_xdg_data_home/opencode/auth.json]='rw'
