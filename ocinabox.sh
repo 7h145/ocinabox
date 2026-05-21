@@ -78,6 +78,10 @@ declare -A C=(
   [use_vim_configuration]='true'
 )
 
+# XDG base directories reminder
+XDG_DATA_HOME="${XDG_DATA_HOME:-"${HOME}/.local/share"}"
+XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
+
 vspec() {
   # $*: VSPEC associative arrays.  Print the "default" fields of each VSPEC
   # array in podman-run(1) `--volume` argument format to stdout.
@@ -173,11 +177,9 @@ declare -A VSPEC=(
 )
 
 [[ "${C[use_xdg_config_home/opencode]}" =~ ^(ro|rw|O)$ ]] && {
-  XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
-
   [[ -d "${XDG_CONFIG_HOME}/opencode" ]] && {
     VSPEC[source-volorpath]="${XDG_CONFIG_HOME}/opencode"
-    VSPEC[options]=":${BASH_REMATCH}"
+    VSPEC[options]=":${BASH_REMATCH[0]}"
   }
 }
 
@@ -186,14 +188,11 @@ PMARGS_VOLUMES+=( '--volume' "$(vspec VSPEC)" )
 # opencode auth.json: if $XDG_DATA_HOME/opencode/auth.json exists,
 # mount it into the container
 [[ "${C[use_xdg_data_home/opencode/auth.json]}" =~ ^(ro|rw)$ ]] && {
-  XDG_DATA_HOME="${XDG_DATA_HOME:-"${HOME}/.local/share"}"
-
-  AUTHJSON="${XDG_DATA_HOME}/opencode/auth.json"
-  [[ -r "${AUTHJSON}" ]] && {
+  [[ -r "${XDG_DATA_HOME}/opencode/auth.json" ]] && {
     declare -A VSPEC=(
-      [source-volorpath]="${AUTHJSON}"
+      [source-volorpath]="${XDG_DATA_HOME}/opencode/auth.json"
       [container-dir]='/root/.local/share/opencode/auth.json'
-      [options]=":${BASH_REMATCH}"
+      [options]=":${BASH_REMATCH[0]}"
     )
     PMARGS_VOLUMES+=( '--volume' "$(vspec VSPEC)" )
   }
@@ -208,7 +207,6 @@ PMARGS_VOLUMES+=( '--volume' "$(vspec VSPEC)" )
   if [[ -d "${HOME}/.vim" ]]; then
     PMARGS_VOLUMES+=( '--volume' "${HOME}/.vim:/root/.vim:ro" )
   else
-    XDG_CONFIG_HOME="${XDG_CONFIG_HOME:-"${HOME}/.config"}"
     [[ -d "${XDG_CONFIG_HOME}/vim" ]] &&
       PMARGS_VOLUMES+=( '--volume' "${XDG_CONFIG_HOME}/vim:/root/.vim:ro" )
   fi
