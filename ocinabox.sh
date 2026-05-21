@@ -96,6 +96,13 @@ vspec() {
   done
 }
 
+volume_exists() {
+  # $1: volume name.  Return 0 if the volume $1 exists or 1 otherwise.
+  # This is a cross container runtime version of `podman volume exists`.
+
+  "${C[crt]}" volume inspect "${1:?}" >/dev/null 2>&1
+}
+
 parse_volumespec() {
   # Check if $1 is a podman-run(1) `--volume` "mount specification like
   # thing"; if so, return the `--volume` argument for this mount.
@@ -120,7 +127,7 @@ parse_volumespec() {
   )
 
   # check if $volorpath is a podman volume or a path
-  if "${C[crt]}" volume exists "${VSPEC[volorpath]}"; then
+  if volume_exists "${VSPEC[volorpath]}"; then
     # this is a podman volume
     VSPEC[source-volorpath]="${VSPEC[volorpath]}"
     VSPEC[container-dir]+="/${VSPEC[volorpath]}"
@@ -149,7 +156,7 @@ while [[ "${#}" -gt '0' && "${1:0:1}" != '-' ]]; do
   PMARGS_PRJVOLUMES+=( '--volume' "${VOLUMESPEC}" )
 shift; done
 
-if [[ -n "${PMARGS_PRJVOLUMES}" ]]; then
+if (( ${#PMARGS_PRJVOLUMES[@]} )); then
   # show what will be mounted
   echo "${IAM}: [notice] will mount:" >&2
   for i in "${PMARGS_PRJVOLUMES[@]/#${HOME}/'~'}"; do
