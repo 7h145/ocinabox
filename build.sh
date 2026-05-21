@@ -15,12 +15,7 @@ command -v npm >&- || npm() {
   "${C[crt]}" run --rm node:current-alpine npm "${@}"
 }
 
-currentnpmversion() {
-  local VERSION; read -r VERSION < <(
-    npm show --json "${1:?}" 2>&- |jq -r '._id')
-  VERSION="${VERSION##*@}"
-  [ -n "${VERSION}" ] && echo "${VERSION}"
-}
+currentnpmversion() { npm view "${1:?}" version; }
 
 PAYLOADVERSION="$(currentnpmversion opencode-ai)"
 #PAYLOADVERSION='1.4.6'     # some fixed version if need be
