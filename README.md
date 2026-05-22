@@ -1,6 +1,6 @@
 # OpenCode in a Box
 
-This is about running an [OpenCode](https://opencode.ai/) AI agent in an isolated containerized environment.
+This is about running an [OpenCode AI agent](httpsopencode.ai/) ([GitHub](https://github.com/anomalyco/opencode), [npm](https://www.npmjs.com/package/opencode-ai)) AI agent in an isolated containerized environment.
 
 In modern times, coding or general AI agents do stuff on your computer. While I appreciate the help, I have serious trust issues regarding someone or something other than me having access to my system and in turn to my data.
 
@@ -20,7 +20,7 @@ This project comes in two parts: The container with OpenCode and some tooling in
 
 ### The OpenCode container
 
-A [Containerfile](https://github.com/7h145/ocinabox/blob/main/Containerfile) and a small [build script](https://github.com/7h145/ocinabox/blob/main/build.sh) build a [Debian trixie](https://www.debian.org/releases/trixie/) based runtime environment with a somewhat sane set of pre-installed tools for the agent pre-installed (but YMMV).
+A [Containerfile](https://github.com/7h145/ocinabox/blob/main/Containerfile) and a small [build script](https://github.com/7h145/ocinabox/blob/main/build.sh) build a [Debian trixie](https://www.debian.org/releases/trixie/) based [Node.js](https://nodejs.org/) runtime environment with the [opencode-ai npm package](https://www.npmjs.com/package/opencode-ai) and a somewhat sane set of pre-installed tools for the agent pre-installed (but YMMV).
 
 You can easily adjust the tooling in the container image for your needs (by editing the Containerfile and run `build.sh` again) or even let the agent itself install new tools at runtime (but be aware that the containers are started not persistent by default).
 
