@@ -22,7 +22,7 @@ This project comes in two parts: The container with OpenCode and some tooling in
 
 ### The OpenCode container
 
-A [Containerfile](Containerfile) and a small [build script](build.sh) build a [Debian trixie](https://www.debian.org/releases/trixie/) based [Node.js](https://nodejs.org/) runtime environment with the [opencode-ai npm package](https://www.npmjs.com/package/opencode-ai) and a somewhat sane set of pre-installed tools for the agent pre-installed (but YMMV).
+A [Containerfile](Containerfile) and a small [build script](build.sh) build a [Debian trixie](https://www.debian.org/releases/trixie/) based [Node.js](https://nodejs.org/) runtime environment with the [opencode-ai npm package](https://www.npmjs.com/package/opencode-ai) and a somewhat sane set of tools for the agent pre-installed (but YMMV).
 
 You can easily adjust the tooling in the container image for your needs (by editing the Containerfile and running `build.sh` again) or even let the agent itself install new tools at runtime (but be aware that the containers are not persistent by default).
 
@@ -68,13 +68,21 @@ Further command line arguments are passed through to `opencode` after the leadin
 
     ocinabox.sh .:ro run 'explain this codebase'
 
-## Notes
+## Usage notes
 
-OpenCode may update or migrate its own configuration when versions change.  A read-only host configuration is safest, but can break such upgrades; a read/write mount is more compatible, but lets the container modify the host configuration.
+OpenCode may update or migrate its own configuration when versions change.  A read-only host configuration is safest, but can break such upgrades; a read/write mount is more compatible, but lets the container modify the host configuration; the default is to mount read/write (for pragmatic reasons).
 
-`ocinabox.sh` therefore defaults to Podman's overlay volume mode (`:O`) for `$XDG_CONFIG_HOME/opencode`.  The host configuration is visible and writable from OpenCode's point of view, but changes are written to a temporary overlay and discarded with the container.  Change the setting to `rw` if you want OpenCode configuration changes to persist on the host.
+### Recommended host configuration
 
-`:O` is Podman-specific.  Use `ro` or `rw` when running with Docker.
+OpenCode uses a very loose interpretation of the [XDG standard](https://specifications.freedesktop.org/basedir/latest/); it e.g. treats its `auth.json` as data but happily dumps  a lot of code into its configuration directory.  For a reasonable approximation of XDG-ish separation, use relative symlinks to keep configuration in `$XDG_CONFIG_HOME` and bulky data-like stuff in `$XDG_DATA_HOME` while preserving OpenCode's expected layout (the pragmatic approach again).  Something like this:
+
+    mkdir -vp ~/.config/opencode
+    touch ~/.config/opencode/auth.json
+    mkdir -vp ~/.local/share/opencode/node_modules
+    ln -vs ../../../.config/opencode/auth.json ~/.local/share/opencode/auth.json
+    ln -vs ../../.local/share/opencode/node_modules ~/.config/opencode/node_modules
+
+By default, `ocinabox.sh` also bind-mounts an existing `~/.local/share/opencode`, so these symlinks resolve inside the container.
 
 ## The Container Runtime
 
@@ -89,7 +97,7 @@ You should really use [rootless](https://rootlesscontaine.rs/) containers, espec
 
 [OpenCode](https://opencode.ai/) was the first AI agent thing that "clicked for me" - that really helped me get stuff done.  I still think it's a great tool, and I have great respect for the people building it.  That said, it has developed into a veritable kitchen sink of features that are somewhat loosely related to being a coding agent (incidentally, this is much the same direction [Claude Code](https://github.com/anthropics/claude-code) has taken).  The pace of development also seems to exceed the time it takes to do actual software architecture work (you know - the part the AIs don't do that well as of the time of this writing).
 
-And then there are various technical considerations, some of them affecting the containerization (which is critical for me, [see trust issues above](#opencode-in-a-box)).  One example is [this bug](https://github.com/anomalyco/opencode/issues/27786) ([which has](https://github.com/anomalyco/opencode/issues/18633) [some history](https://github.com/anomalyco/opencode/issues/21966)).
+And then there are various technical considerations, some of them affecting the containerization (which is critical for me, [see trust issues above](#opencode-in-a-box)).  One example is [this bug](https://github.com/anomalyco/opencode/issues/27786) ([which has](https://github.com/anomalyco/opencode/issues/18633) [some history](https://github.com/anomalyco/opencode/issues/21966)), another example is [this one](https://github.com/anomalyco/opencode/issues/16777).
 
 See, OpenCode expects its configuration to be readable and writable (which is sort of fine; running it in a container is my problem, not theirs), but at the same time it dumps >50 MB of code into the configuration directory ([where it does not belong](https://specifications.freedesktop.org/basedir/latest/)).  I can work around this, but even just documenting such foolishness in a way casual users can deal with is kind of useless work.  And the best part: since [OpenCode's release cadence is absurd](https://github.com/anomalyco/opencode/releases), this might be fixed while I'm typing.
 

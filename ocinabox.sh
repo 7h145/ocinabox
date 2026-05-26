@@ -54,27 +54,37 @@ declare -A C=(
   # The default name prefix is derived from the basename of this script.
   [name]="${IAM%.sh}"
 
-  # Use host opencode configuration: if set to 'ro', 'rw', or 'O' and
-  # $XDG_CONFIG_HOME/opencode exists on the host, mount it into the
-  # container with the selected `--volume` option.  'O' is podman's
-  # overlay mount mode: host files are visible and container writes
-  # succeed, but changes are discarded with the container.
+  # Mount mode settings for host directories below:  Values 'ro', 'rw',
+  # and 'O' mean: if a suitable host-side directory exists, mount it
+  # into the container with the selected `--volume` option.
+  #
+  #  ro      read-only bind mount
+  #  rw      read/write bind mount
+  #  O       podman overlay mount: host files are visible, container
+  #          writes succeed, changes are discarded with the container
+  #
+  # Further values are
+  #
+  #  volume  read/write mount a dedicated volume for this container
+  #          directory (when applicable)
+  #  false   do not mount this volume or directory
+  #
   # Note: 'O' is podman-specific; use 'ro' or 'rw' with docker.
-  # Any other value (like e.g. 'volume') uses isolated configuration in
-  # the $C[name]-config volume.
-  # Default is 'O', use host configuration without modifying it.
-  [use_xdg_config_home/opencode]='O'
 
-  # Use host opencode auth.json: if set to 'ro' or 'rw' and
-  # $XDG_DATA_HOME/opencode/auth.json exists on the host, mount it into
-  # the container with the selected `--volume` option.
-  # Any other value (like e.g. 'volume') uses an isolated auth.json in
-  # the $C[name]-share volume.
-  # Default is 'rw', use host auth.json read/write.
-  [use_xdg_data_home/opencode/auth.json]='rw'
+  # opencode configuration directory, $XDG_CONFIG_HOME/opencode.
+  # Default: 'rw', mount an existing host opencode configuration
+  # directory read/write into the container, if none exists, use
+  # 'volume'.
+  [mount_xdg_config_home]='rw'
 
-  # Use host vim configuration: if 'true' and some vim configuration can
-  # be found on the host, mount it read-only into the container.
+  # opencode data directory, $XDG_DATA_HOME/opencode ('auth.json', logs
+  # and sessions are stored here among other things maybe).
+  # Default: 'rw', mount an existing $XDG_DATA_HOME/opencode read/write
+  # into the container, if none exists, use 'volume'.
+  [mount_xdg_data_home]='rw'
+
+  # Host vim configuration (always 'ro', no volume fallback).
+  # Default: 'true', mount found vim configuration read-only.
   [use_vim_configuration]='true'
 )
 
@@ -169,41 +179,51 @@ fi
 
 
 PMARGS_VOLUMES=(
-  # opencode runtime data
-  '--volume' "${C[name]}-share:/root/.local/share/opencode"
-  '--volume' "${C[name]}-state:/root/.local/state/opencode"
-  '--volume' "${C[name]}-cache:/root/.cache/opencode"
+  # static volumes, runtime data.
+  '--volume' "${C[name]}-xdgstate:/root/.local/state/opencode"
+  '--volume' "${C[name]}-xdgcache:/root/.cache/opencode"
   '--volume' "${C[name]}-bun:/root/.bun"
 )
 
-# opencode configuration: use a dedicated volume or mount an existing
-# $XDG_CONFIG_HOME/opencode configuration into the container
-declare -A VSPEC=(
-  [source-volorpath]="${C[name]}-config"
-  [container-dir]='/root/.config/opencode'
-)
+# opencode $XDG_CONFIG_HOME: mount an existing $XDG_CONFIG_HOME/opencode
+# directory into the container or fall back to a dedicated volume.
+if [[ -v C[mount_xdg_config_home] ]] &&
+  [[ ! "${C[mount_xdg_config_home]}" =~ ^(false|no|0)$ ]]; then
 
-[[ "${C[use_xdg_config_home/opencode]}" =~ ^(ro|rw|O)$ ]] && {
-  [[ -d "${XDG_CONFIG_HOME}/opencode" ]] && {
-    VSPEC[source-volorpath]="${XDG_CONFIG_HOME}/opencode"
-    VSPEC[options]=":${BASH_REMATCH[0]}"
+  declare -A VSPEC=(
+    [source-volorpath]="${C[name]}-xdgconfig"
+    [container-dir]='/root/.config/opencode'
+  )
+
+  [[ "${C[mount_xdg_config_home]}" =~ ^(ro|rw|O)$ ]] && {
+    [[ -d "${XDG_CONFIG_HOME}/opencode" ]] && {
+      VSPEC[source-volorpath]="${XDG_CONFIG_HOME}/opencode"
+      VSPEC[options]=":${BASH_REMATCH[0]}"
+    }
   }
-}
 
-PMARGS_VOLUMES+=( '--volume' "$(vspec VSPEC)" )
+  PMARGS_VOLUMES+=( '--volume' "$(vspec VSPEC)" )
+fi
 
-# opencode auth.json: if $XDG_DATA_HOME/opencode/auth.json exists,
-# mount it into the container
-[[ "${C[use_xdg_data_home/opencode/auth.json]}" =~ ^(ro|rw)$ ]] && {
-  [[ -r "${XDG_DATA_HOME}/opencode/auth.json" ]] && {
-    declare -A VSPEC=(
-      [source-volorpath]="${XDG_DATA_HOME}/opencode/auth.json"
-      [container-dir]='/root/.local/share/opencode/auth.json'
-      [options]=":${BASH_REMATCH[0]}"
-    )
-    PMARGS_VOLUMES+=( '--volume' "$(vspec VSPEC)" )
+# opencode $XDG_DATA_HOME: mount an existing $XDG_DATA_HOME/opencode
+# directory into the container or fall back to a dedicated volume.
+if [[ -v C[mount_xdg_data_home] ]] &&
+  [[ ! "${C[mount_xdg_data_home]}" =~ ^(false|no|0)$ ]]; then
+
+  declare -A VSPEC=(
+    [source-volorpath]="${C[name]}-xdgdata"
+    [container-dir]='/root/.local/share/opencode'
+  )
+
+  [[ "${C[mount_xdg_data_home]}" =~ ^(ro|rw|O)$ ]] && {
+    [[ -d "${XDG_DATA_HOME}/opencode" ]] && {
+      VSPEC[source-volorpath]="${XDG_DATA_HOME}/opencode"
+      VSPEC[options]=":${BASH_REMATCH[0]}"
+    }
   }
-}
+
+  PMARGS_VOLUMES+=( '--volume' "$(vspec VSPEC)" )
+fi
 
 # vim configuration: if some vim configuration can be found, mount it
 # into the container
