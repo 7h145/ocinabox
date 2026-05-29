@@ -47,7 +47,7 @@ RUN true \
     lsof \
     netcat-openbsd \
     openssh-client \
-    rsync
+    rsync \
     socat \
     strace \
     tmux

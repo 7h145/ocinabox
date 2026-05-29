@@ -86,6 +86,10 @@ declare -A C=(
   # Host vim configuration (always 'ro', no volume fallback).
   # Default: 'true', mount found vim configuration read-only.
   [use_vim_configuration]='true'
+
+  # Host tmux configuration (always 'ro', no volume fallback).
+  # Default: 'true', mount found tmux configuration read-only.
+  [use_tmux_configuration]='true'
 )
 
 # XDG base directories reminder
