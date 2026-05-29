@@ -239,6 +239,17 @@ fi
   fi
 }
 
+# tmux configuration: if some tmux configuration can be found, mount it
+# into the container
+[[ "${C[use_tmux_configuration]}" = 'true' ]] && {
+  [[ -f "${HOME}/.tmux.conf" ]] &&
+    PMARGS_VOLUMES+=( '--volume' "${HOME}/.tmux.conf:/root/.tmux.conf:ro" )
+
+  [[ -d "${XDG_CONFIG_HOME}/tmux" ]] &&
+    PMARGS_VOLUMES+=( '--volume'
+      "${XDG_CONFIG_HOME}/tmux:/root/.config/tmux:ro" )
+}
+
 PMARGV=(
   '--name' "${C[name]}-${SRANDOM}"
   '--interactive' '--tty' '--rm'
